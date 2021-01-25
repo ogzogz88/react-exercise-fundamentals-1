@@ -45,12 +45,14 @@ const App = () => {
   return (
     <div>
       <h1>Hacker Stories</h1>
+      {/* using composition inside InputWithLabelComponent (using it like a html element by the help of children prop)*/}
       <InputWithLabel
         id="search"
-        label="Search"
         value={searchTerm}
         onInputChange={handleSearch}
-      />
+      >
+        <strong>Search:</strong>
+      </InputWithLabel>
       <hr />
       <List list={searchedStories} />
     </div>
@@ -72,9 +74,9 @@ const Item = ({ title, url, author, num_comments, points }) => (
   </div>
 );
 
-const InputWithLabel = ({ id, label, value, type = 'text', onInputChange }) => (
+const InputWithLabel = ({ id, value, type = 'text', onInputChange, children }) => (
   <>
-    <label htmlFor={id}>{label}: </label>
+    <label htmlFor={id}>{children} </label>
   &nbsp;
     <input
       value={value}
