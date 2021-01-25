@@ -36,20 +36,21 @@ const App = () => {
     },
   ];
 
-
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   }
   const searchedStories = stories.filter(story => {
     return story.title.toLowerCase().includes(searchTerm.toLowerCase());
   });
-
   return (
     <div>
-      <h1>
-        Hacker Stories
-      </h1>
-      <Search search={searchTerm} onSearch={handleSearch} />
+      <h1>Hacker Stories</h1>
+      <InputWithLabel
+        id="search"
+        label="Search"
+        value={searchTerm}
+        onInputChange={handleSearch}
+      />
       <hr />
       <List list={searchedStories} />
     </div>
@@ -59,6 +60,7 @@ const List = ({ list }) => {
   //using rest and spread operators together (first 3dots is rest, second 3dots is spread operator)
   return list.map(({ objectID, ...item }) => <Item key={objectID} {...item} />);
 }
+
 const Item = ({ title, url, author, num_comments, points }) => (
   <div>
     <span>
@@ -69,14 +71,18 @@ const Item = ({ title, url, author, num_comments, points }) => (
     <span>{points}</span>
   </div>
 );
-const Search = ({ onSearch, search }) => {
 
-  return (
-    <div>
-      <label htmlFor="search">Search: </label>
-      <input value={search} id="search" type="text" onChange={onSearch} />
-    </div>
-  );
+const InputWithLabel = ({ id, label, value, type = 'text', onInputChange }) => {
+  <>
+    <label htmlFor={id}>{label}: </label>
+  &nbsp;
+    <input
+      value={value}
+      id={id}
+      type={type}
+      onChange={onInputChange}
+    />
+  </>
 }
 
 export default App;
