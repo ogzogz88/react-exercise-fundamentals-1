@@ -1,8 +1,10 @@
-import logo from './logo.svg';
+import React, { useState } from "react";
 import './App.css';
 
 
+
 const App = () => {
+
   const stories = [
     {
       title: 'React',
@@ -21,34 +23,48 @@ const App = () => {
       objectID: 1,
     },
   ];
-  const handleChange = (event) => {
-    console.log(event.target.value)
+  const [searchTerm, setSearchTerm] = useState("React");
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
   }
+  const searchedStories = stories.filter(story => {
+    return story.title.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
   return (
     <div>
       <h1>
         Hacker Stories
       </h1>
-      <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={handleChange} />
+      <Search search={searchTerm} onSearch={handleSearch} />
       <hr />
-      <List list={stories} />
+      <List list={searchedStories} />
     </div>
   );
 }
 const List = ({ list }) => {
-  return list.map(item => {
-    return (
-      <div key={item.objectID}>
-        <span>
-          <a href={item.url}>{item.title}</a>
-        </span>
-        <span>{item.author}</span>
-        <span>{item.num_comments}</span>
-        <span>{item.points}</span>
-      </div>
-    );
-  });
+  //using rest and spread operators together (first 3dots is rest, second 3dots is spread operator)
+  return list.map(({ objectID, ...item }) => <Item key={objectID} {...item} />);
+}
+const Item = ({ title, url, author, num_comments, points }) => (
+  <div>
+    <span>
+      <a href={url}>{title}</a>
+    </span>
+    <span>{author}</span>
+    <span>{num_comments}</span>
+    <span>{points}</span>
+  </div>
+);
+const Search = ({ onSearch, search }) => {
+
+  return (
+    <div>
+      <label htmlFor="search">Search: </label>
+      <input value={search} id="search" type="text" onChange={onSearch} />
+    </div>
+  );
 }
 
 export default App;
