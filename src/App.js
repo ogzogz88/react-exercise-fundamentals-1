@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import './App.css';
 
 // using custom hook, name is useSemiPersistentState just because it uses localStorage, and deleting localStorage may change the state
@@ -50,6 +50,7 @@ const App = () => {
         id="search"
         value={searchTerm}
         onInputChange={handleSearch}
+        isFocused//default to true, isFocused EQUALS isFocused = {true}
       >
         <strong>Search:</strong>
       </InputWithLabel>
@@ -74,17 +75,29 @@ const Item = ({ title, url, author, num_comments, points }) => (
   </div>
 );
 
-const InputWithLabel = ({ id, value, type = 'text', onInputChange, children }) => (
-  <>
-    <label htmlFor={id}>{children} </label>
-  &nbsp;
-    <input
-      value={value}
-      id={id}
-      type={type}
-      onChange={onInputChange}
-    />
-  </>
-)
+const InputWithLabel = ({ id, value, type = 'text', onInputChange, isFocused, children }) => {
+  const inputRef = useRef();
+  useEffect(() => {
+    if (isFocused && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isFocused]);
+  return (
+    <>
+      <label htmlFor={id}>{children} </label>
+      &nbsp;
+      <input
+        ref={inputRef}
+        value={value}
+        id={id}
+        type={type}
+        onChange={onInputChange}
+        autoFocus={isFocused}
+      //add auto focus declaretively
+      //autoFocus
+      />
+    </>
+  );
+}
 
 export default App;
