@@ -72,7 +72,7 @@ const Item = ({ title, url, author, num_comments, points }) => (
   </div>
 );
 
-const InputWithLabel = ({ id, label, value, type = 'text', onInputChange }) => {
+const InputWithLabel = ({ id, label, value, type = 'text', onInputChange }) => (
   <>
     <label htmlFor={id}>{label}: </label>
   &nbsp;
@@ -83,6 +83,6 @@ const InputWithLabel = ({ id, label, value, type = 'text', onInputChange }) => {
       onChange={onInputChange}
     />
   </>
-}
+)
 
 export default App;
