@@ -20,6 +20,14 @@ const initialStories = [
   },
 ];
 
+const getAsyncStories = () => {
+  return new Promise(resolve =>
+    setTimeout(
+      () => resolve({ data: { stories: initialStories } }),
+      2000)
+  );
+}
+
 
 // using custom hook, name is useSemiPersistentState just because it uses localStorage, and deleting localStorage may change the state
 // custom hook name convention: use + UpperCase name
@@ -35,9 +43,16 @@ const useSemiPersistentState = (key, initialState) => {
   return [value, setValue];
 }
 
+
 const App = () => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-  const [stories, setStories] = React.useState(initialStories);
+  const [stories, setStories] = useState([]);
+  // simulate async data fetching
+  useEffect(() => {
+    getAsyncStories().then(result => {
+      setStories(result.data.stories);
+    })
+  });
 
   const handleRemoveStory = (item) => {
     const newStories = stories.filter(
