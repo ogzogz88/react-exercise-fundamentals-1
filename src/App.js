@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from "react";
 import './App.css';
 
-
+// using custom hook, name is useSemiPersistentState just because it uses localStorage, and deleting localStorage may change the state
+// custom hook name convention: use + UpperCase name
+// return values must be an array of values
+const useSemiPersistentState = (key, initialState) => {
+  const [value, setValue] = useState(
+    localStorage.getItem(key) || initialState
+  );
+  // seperate the side effect(setting a value to localstorage)
+  useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [key, value]);
+  return [value, setValue];
+}
 
 const App = () => {
-
+  const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
   const stories = [
     {
       title: 'React',
@@ -23,13 +35,7 @@ const App = () => {
       objectID: 1,
     },
   ];
-  const [searchTerm, setSearchTerm] = useState(
-    localStorage.getItem("search") || "React"
-  );
-  // seperate the side effect(setting a value to localstorage)
-  useEffect(() => {
-    localStorage.setItem('search', searchTerm);
-  }, [searchTerm]);
+
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
