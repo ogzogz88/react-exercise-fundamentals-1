@@ -22,14 +22,32 @@ const initialStories = [
 
 const storiesReducer = (state, action) => {
   switch (action.type) {
-    case "SET_STORIES":
-      return action.payload;
+    case "STORIES_FETCH_INIT":
+      return {
+        ...state,
+        isLoading: true,
+        isError: false,
+      };
+    case "STORIES_FETCH_SUCCESS":
+      return {
+        isLoading: false,
+        isError: false,
+        data: action.payload,
+      };
+    case "STORIES_FETCH_FAILURE":
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      };
     case "REMOVE_STORY":
-      return state.filter(
-        story => action.payload.objectID !== story.objectID
-      );
+      return {
+        ...state,
+        data: state.data.filter(
+          story => action.payload.objectID !== story.objectID)
+      };
     default:
-      return []
+      throw new Error();
   }
 }
 
@@ -60,37 +78,31 @@ const useSemiPersistentState = (key, initialState) => {
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-  // const [stories, setStories] = useState([]); useState to useReducer
+
   const [stories, dispatchStories] = useReducer(
     storiesReducer,
-    []
+    { data: [], isLoading: false, isError: false }
   )
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+
+
   // simulate async data fetching
   useEffect(() => {
-    setIsLoading(true);
+    dispatchStories({ type: "STORIES_FETCH_INIT" });
     getAsyncStories()
       .then(result => {
-        // setStories(result.data.stories); useState to useReducer
         dispatchStories({
-          type: "SET_STORIES",
+          type: "STORIES_FETCH_SUCCESS",
           payload: result.data.stories,
-        })
-        setIsLoading(false);
+        });
       })
-      .catch(() => setIsError(true));
+      .catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+      );
 
   }, []);
 
   const handleRemoveStory = (item) => {
-    // useState to useReducer
-    // const newStories = stories.filter(
-    //   story => item.objectID !== story.objectID
-    // );
-    // setStories(newStories); 
     dispatchStories({
-      type: "REMOVE_STORIES",
+      type: "REMOVE_STORY",
       payload: item,
     })
   }
@@ -98,7 +110,7 @@ const App = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   }
-  const searchedStories = stories.filter(story => {
+  const searchedStories = stories.data.filter(story => {
     return story.title.toLowerCase().includes(searchTerm.toLowerCase());
   });
   return (
@@ -114,9 +126,9 @@ const App = () => {
         <strong>Search:</strong>
       </InputWithLabel>
       <hr />
-      {isError && <p>Something went wrong ...</p>}
+      {stories.isError && <p>Something went wrong ...</p>}
       {/* adding coditional rendering */}
-      {isLoading ?
+      {stories.isLoading ?
         (<p>Loading...</p>) :
         (
           <List
