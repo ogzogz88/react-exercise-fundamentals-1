@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useReducer } from "react";
 import './App.css';
 
 const initialStories = [
@@ -20,6 +20,20 @@ const initialStories = [
   },
 ];
 
+const storiesReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_STORIES":
+      return action.payload;
+    case "REMOVE_STORY":
+      return state.filter(
+        story => action.payload.objectID !== story.objectID
+      );
+    default:
+      return []
+  }
+}
+
+// imitate async data fetching
 const getAsyncStories = () => {
   return new Promise(resolve =>
     setTimeout(
@@ -46,7 +60,11 @@ const useSemiPersistentState = (key, initialState) => {
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-  const [stories, setStories] = useState([]);
+  // const [stories, setStories] = useState([]); useState to useReducer
+  const [stories, dispatchStories] = useReducer(
+    storiesReducer,
+    []
+  )
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   // simulate async data fetching
@@ -54,7 +72,11 @@ const App = () => {
     setIsLoading(true);
     getAsyncStories()
       .then(result => {
-        setStories(result.data.stories);
+        // setStories(result.data.stories); useState to useReducer
+        dispatchStories({
+          type: "SET_STORIES",
+          payload: result.data.stories,
+        })
         setIsLoading(false);
       })
       .catch(() => setIsError(true));
@@ -62,10 +84,15 @@ const App = () => {
   }, []);
 
   const handleRemoveStory = (item) => {
-    const newStories = stories.filter(
-      story => item.objectID !== story.objectID
-    );
-    setStories(newStories);
+    // useState to useReducer
+    // const newStories = stories.filter(
+    //   story => item.objectID !== story.objectID
+    // );
+    // setStories(newStories); 
+    dispatchStories({
+      type: "REMOVE_STORIES",
+      payload: item,
+    })
   }
 
   const handleSearch = (event) => {
