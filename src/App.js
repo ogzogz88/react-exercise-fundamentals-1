@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useReducer } from "react";
+import React, { useState, useEffect, useRef, useReducer, useCallback } from "react";
 import './App.css';
 
 const storiesReducer = (state, action) => {
@@ -56,24 +56,27 @@ const App = () => {
     storiesReducer,
     { data: [], isLoading: false, isError: false }
   )
-
-
-  // simulate async data fetching
-  useEffect(() => {
+  //using memoized handler, this increased performance from %46 to %55, at the lighthouse report
+  const handleFetchStories = useCallback(() => {
     if (!searchTerm) return;
-    dispatchStories({ type: "STORIES_FETCH_INIT" });
+    dispatchStories({ type: 'STORIES_FETCH_INIT' });
     fetch(`${API_ENDPOINT}${searchTerm}`)
       .then(response => response.json())
       .then(result => {
         dispatchStories({
-          type: "STORIES_FETCH_SUCCESS",
+          type: 'STORIES_FETCH_SUCCESS',
           payload: result.hits,
         });
       })
-      .catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+      .catch(() =>
+        dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
       );
+  }, [searchTerm]); // E
 
-  }, [searchTerm]);
+  useEffect(() => {
+    handleFetchStories(); // C
+  }, [handleFetchStories]); // D
+
 
   const handleRemoveStory = (item) => {
     dispatchStories({
