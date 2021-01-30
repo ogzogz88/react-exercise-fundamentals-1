@@ -59,8 +59,9 @@ const App = () => {
   const handleSearchInput = event => {
     setSearchTerm(event.target.value);
   };
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (event) => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
+    event.preventDefault();
   };
 
   const [stories, dispatchStories] = useReducer(
@@ -72,7 +73,6 @@ const App = () => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
     axios
       .get(url)
-      .then(response => response.json())
       .then(result => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
@@ -99,22 +99,12 @@ const App = () => {
   return (
     <div>
       <h1>Hacker Stories</h1>
-      {/* using composition inside InputWithLabelComponent (using it like a html element by the help of children prop)*/}
-      <InputWithLabel
-        id="search"
-        value={searchTerm}
-        onInputChange={handleSearchInput}
-        isFocused//default to true, isFocused EQUALS isFocused = {true}
-      >
-        <strong>Search:</strong>
-      </InputWithLabel>
-      <button
-        type="button"
-        disabled={!searchTerm}
-        onClick={handleSearchSubmit}
-      >
-        Submit
-      </button>
+      <SearchForm
+        searchTerm={searchTerm}
+        onSearchInput={handleSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+      />
+
       <hr />
       {stories.isError && <p>Something went wrong ...</p>}
       {/* adding coditional rendering */}
@@ -130,6 +120,26 @@ const App = () => {
     </div>
   );
 }
+const SearchForm = ({
+  searchTerm,
+  onSearchInput,
+  onSearchSubmit,
+}) => (
+  <form onSubmit={onSearchSubmit}>
+    <InputWithLabel
+      id="search"
+      value={searchTerm}
+      isFocused
+      onInputChange={onSearchInput}
+    >
+      <strong>Search:</strong>
+    </InputWithLabel>
+    <button type="submit" disabled={!searchTerm}>
+      Submit
+  </button>
+  </form>
+);
+
 const List = ({ list, onRemoveItem }) => {
   //using rest and spread operators together (first 3dots is rest, second 3dots is spread operator)
   //return list.map(({ objectID, ...item }) => <Item key={objectID} {...item} onRemoveItem={onRemoveItem} />);
