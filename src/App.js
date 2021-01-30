@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useReducer, useCallback } from "react";
+import axios from 'axios';
 import './App.css';
+
 
 const storiesReducer = (state, action) => {
   switch (action.type) {
@@ -68,12 +70,13 @@ const App = () => {
   //using memoized handler, this increased performance from %46 to %55, at the lighthouse report
   const handleFetchStories = useCallback(() => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
-    fetch(url)
+    axios
+      .get(url)
       .then(response => response.json())
       .then(result => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
-          payload: result.hits,
+          payload: result.data.hits,
         });
       })
       .catch(() =>
