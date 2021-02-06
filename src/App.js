@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useReducer, useCallback } from "react";
 import axios from 'axios';
-import './App.css';
+import AppStyles from './App.module.css';
 
 
 const storiesReducer = (state, action) => {
@@ -97,15 +97,24 @@ const App = () => {
   }
 
   return (
-    <div className="container">
-      <h1 className="headline-primary">Hacker Stories</h1>
+    <div className={AppStyles.container}>
+      <h1 className={AppStyles.headlinePrimary}>Hacker Stories</h1>
       <SearchForm
         searchTerm={searchTerm}
         onSearchInput={handleSearchInput}
         onSearchSubmit={handleSearchSubmit}
       />
 
-      <hr className="divider" />
+      <hr className={AppStyles.divider} />
+      <div className={AppStyles.item}>
+        <span style={{ width: '32%' }}>
+          <strong>Title</strong>
+        </span>
+        <span style={{ width: '16%' }} className={AppStyles.hideOnMobile}><strong>Author</strong></span>
+        <span style={{ width: '16%' }} className={AppStyles.hideOnMobile}><strong>Comments</strong> </span>
+        <span style={{ width: '16%', marginRight: '20%' }} className={AppStyles.hideOnMobile}><strong>Points</strong> </span>
+
+      </div>
       {stories.isError && <p>Something went wrong ...</p>}
       {/* adding coditional rendering */}
       {stories.isLoading ?
@@ -125,16 +134,17 @@ const SearchForm = ({
   onSearchInput,
   onSearchSubmit,
 }) => (
-  <form onSubmit={onSearchSubmit} className="search-form">
+  <form onSubmit={onSearchSubmit} className={AppStyles.searchForm}>
     <InputWithLabel
       id="search"
       value={searchTerm}
       isFocused
       onInputChange={onSearchInput}
     >
-      <strong>Search:</strong>
+      <strong>Search</strong>
     </InputWithLabel>
-    <button type="submit" disabled={!searchTerm} className="button button_large">
+    <button type="submit" disabled={!searchTerm}
+      className={`${AppStyles.button} ${AppStyles.buttonLarge} ${AppStyles.buttonSubmit}`}>
       Submit
   </button>
   </form>
@@ -157,26 +167,26 @@ const Item = ({ item, onRemoveItem }) => {
   const handleRemoveItem = () => onRemoveItem(item);
 
   return (
-    <div className="item">
-      <span style={{ width: '40%' }}>
-        <a href={item.url}>{item.title}</a>
+    <div className={AppStyles.item}>
+      <span style={{ width: '32%' }}>
+        <a href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
       </span>
-      <span style={{ width: '30%' }}>{item.author}</span>
-      <span style={{ width: '10%' }}>{item.num_comments}</span>
-      <span style={{ width: '10%' }}>{item.points}</span>
-      <span style={{ width: '10%' }}>
+      <span style={{ width: '16%' }} >{item.author}</span>
+      <span style={{ width: '16%' }} className={AppStyles.hideOnMobile}>{item.num_comments} </span>
+      <span style={{ width: '16%' }} className={AppStyles.hideOnMobile}>{item.points} </span>
 
-        {/* executing item remove in the classical way
+      {/* executing item remove in the classical way
       <button type="button" onClick={handleRemoveItem}> */}
 
-        {/* using inline handler by the help of arrow functions */}
-        {/* avoid complex logic here!, one function to execute is enough */}
-        <button type="button" onClick={() => handleRemoveItem(item)} className="button button_small">
+      {/* using inline handler by the help of arrow functions */}
+      {/* avoid complex logic here!, one function to execute is enough */}
+      <span style={{ width: '20%', display: "flex", justifyContent: "flex-end" }}>
+        <button type="button" onClick={() => handleRemoveItem(item)}
+          className={`${AppStyles.button} ${AppStyles.buttonSmall}`}>
           Dismiss
         </button>
-      </span>
-
-    </div>
+      </span >
+    </div >
   );
 };
 
@@ -189,8 +199,7 @@ const InputWithLabel = ({ id, value, type = 'text', onInputChange, isFocused, ch
   }, [isFocused]);
   return (
     <>
-      <label htmlFor={id} className="label">{children} </label>
-      &nbsp;
+      <label htmlFor={id} className={AppStyles.label}>{children} </label>
       <input
         ref={inputRef}
         value={value}
@@ -198,7 +207,7 @@ const InputWithLabel = ({ id, value, type = 'text', onInputChange, isFocused, ch
         type={type}
         onChange={onInputChange}
         autoFocus={isFocused}
-        className="input"
+        className={AppStyles.input}
       //add auto focus declaretively
       //autoFocus
       />
